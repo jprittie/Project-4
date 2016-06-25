@@ -12,7 +12,7 @@ $(function(){
 // When the player clicks start button, the start screen disappears,
 // the board appears and the game begins
 $(".button").click(function(e){
-  e.preventDefault;
+  e.preventDefault();
   console.log("Start button clicked");
   $("#start").hide();
   $("#board").show();
