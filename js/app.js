@@ -1,6 +1,6 @@
 
 
-// 1. When the page loads, display start screen
+// When the page loads, display start screen
 $(function(){
   // Hide game fields
   $("#board").hide();
