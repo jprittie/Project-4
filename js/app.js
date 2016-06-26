@@ -1,6 +1,7 @@
-var winningarray = [[0,1,2], [0,3,6]];
+var winningarray = [ [0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8], [0,4,8], [2,4,6] ];
 var oharray = [];
 var exarray = [];
+var fillcounter = 0;
 
 // When the page loads, display start screen
 $(function(){
@@ -20,12 +21,7 @@ $(function(){
       $("#board").show();
     });
 
-//DON'T NEED TO DO ANY OF THIS BECAUSE OF MOUSEENTER/MOUSELEAVE
-// Give all boxes a class of available at first
-// Cycle over boxes with this class
-// After a square is chosen, remove class of available
-// Or, just filter for box-filled-1 and box-filled-2
-// $(".boxes li").addClass("available");
+
 
 // On hover, player-specific svg appears
     $(".boxes li").hover(function() {
@@ -60,38 +56,51 @@ $(function(){
     $(this).unbind("mouseenter mouseleave");
 
   // Test state of board against possible solutions
+  /* I need to check whether the three values in any of winningarray's sub-arrays are all
+     included in oharray or exarray. If they are, game is over. If they are not, we keep going
+     until there is a draw or a winner.
+  */
+var nowinner = true;
 
-   winningarray = JSON.stringify(winningarray);
-   var newoharray = JSON.stringify(oharray);
-   var newexarray = JSON.stringify(exarray);
+for (var i=0; i<winningarray.length; i++){
+  var firsttest = winningarray[i][0];
+  var secondtest = winningarray[i][1];
+  var thirdtest = winningarray[i][2];
 
-   var ohwinner = winningarray.indexOf(newoharray);
-   var exwinner = winningarray.indexOf(newexarray);
-   if (ohwinner != -1) {
-     console.log("O wins");
-   } else if (exwinner != -1) {
-     console.log("X wins")
-   }
-//  var ohwinner = winningarray.indexOf(oharray);
-// var ohwinner = winningarray.includes(oharray);
-// jQuery.inArray(oharray, winningarray)
+  if (oharray.includes(firsttest) && oharray.includes(secondtest) && oharray.includes(thirdtest)) {
+    console.log("O wins");
+    nowinner = false;
+  } else if (exarray.includes(firsttest) && exarray.includes(secondtest) && exarray.includes(thirdtest)) {
+    console.log("X wins");
+    nowinner = false;
+  } else {
+    nowinner = true;
+    drawTest();
+  }
 
-// Cycle through winningarray
-  /* for (var i=0; i<winningarray.length; i++) {
-      console.log(winningarray[i].indexOf(oharray));
-      console.log(jQuery.inArray(oharray, winningarray[i]))
-      console.log(winningarray[i].includes(oharray));
-         if (winningarray[i].includes(oharray)){
-          console.log("O wins");
-        }
-        else if (winningarray[i].includes(exarray)){
-          console.log("X wins");
-        }
-    } */
+}
 
-//  if (ohwinner > 0) {
-//    console.log("O wins")
-//  }
+// How do I test for a draw?
+// If all squares are filled and nowinner == true
+// Cycle through all the boxes
+// if box has class .box-filled-1 or .box-filled-2
+function drawTest(){
+    fillcounter = 0;
+
+        $(".boxes li").each(function(){
+            if ( $(this).hasClass("box-filled-1") || $(this).hasClass("box-filled-2") ) {
+              fillcounter += 1;
+            }
+        });
+
+    console.log("fillcounter is " + fillcounter);
+    if ( (fillcounter == 9) && (nowinner === true) ) {
+      console.log("It's a draw.");
+    }
+
+}
+
+
 
   // You want to do this before toggling active class
     $("#player1").toggleClass("active");
@@ -99,28 +108,21 @@ $(function(){
   });
 
 
-}); //this is the document ready closing brackets
+});
 
-//Should I build the board as an object? Should I build each square as an object?
-//The thing is, I don't want to access multiple properties
+
 
 
 /*
-
-- number squares (but you could just use their position in the array?)
-- write out all possible winning solutions
-(but does indexOf or inArray work? combination would have to be in correct order,
-i.e. one, four, seven as opposed to seven, four, one... though you could test front to back then back to front...)
 - for each turn:
     - on hover over each square, svg appears
-    - player picks a square by clicking?
+    - player picks a square by clicking
     - svg is added to that square
     - blue background is added to that square
     - then that square isn't available anymore
     - can I use filter to weed out squares that are taken?
-    - active class toggles to other player
     - test state of board against all possible solutions
     - if player wins, indicate that
     - game is over
-
+    - else, active class toggles to other player
 */
