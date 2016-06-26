@@ -27,7 +27,7 @@ $(function(){
 $(".boxes li").addClass("available");
 
 // On hover, player-specific svg appears
-    $(".available").hover(function() {
+    $(".boxes li").hover(function() {
         if ($("#player1").hasClass("active")) {
           $(this).css("background-image", "url(./img/o.svg)");
         }
@@ -40,8 +40,7 @@ $(".boxes li").addClass("available");
     });
 
 
-
-  $(".available").click(function(){
+ $(".boxes li").click(function(){
       if ($("#player1").hasClass("active")) {
        $(this).addClass("box-filled-1");
       }
@@ -49,7 +48,7 @@ $(".boxes li").addClass("available");
        $(this).addClass("box-filled-2");
       }
 
-    $(this).removeClass("available");
+    $(this).unbind("mouseenter mouseleave");
     $("#player1").toggleClass("active");
     $("#player2").toggleClass("active");
   });
