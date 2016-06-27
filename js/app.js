@@ -56,23 +56,32 @@ $(function(){
     });
 
 
+ // On click, player-specific svg is added to square,
+ // box is filled with appropriate background colour
  $(".boxes li").click(function(){
       if ($("#player1").hasClass("active")) {
        $(this).addClass("box-filled-1");
-       // Add square to o array
+       // I keep track of square's number based on its position
+       // in the $(".boxes li") array-like collection;
+       // i.e., boxes already have index numbers from 0 to 8,
+       // and I'm just utilizing those numbers
        var ohsquarenumber = ($(".boxes li").index($(this)));
+       // Add square to oharray, to keep track of which squares O has chosen
        oharray.push(ohsquarenumber);
-       console.log(oharray);
+
       }
       else {
        $(this).addClass("box-filled-2");
-       // Add square to x array
        var exsquarenumber = ($(".boxes li").index($(this)));
+       // Add square to exarray
        exarray.push(exsquarenumber);
-       console.log(exarray);
+
       }
 
+    // Next line disables hover method on square that was clicked on
+    // (also makes sure you can't click on it again?)
     $(this).unbind("mouseenter mouseleave");
+
 
   // Test state of board against possible solutions
   /* I need to check whether the three values in any of winningarray's sub-arrays are all
@@ -87,14 +96,14 @@ $(function(){
       var thirdtest = winningarray[i][2];
 
       if (oharray.includes(firsttest) && oharray.includes(secondtest) && oharray.includes(thirdtest)) {
-        console.log("O wins");
+
         nowinner == false;
         $("#board").hide();
         $(".message").text("Winner");
         $(".screen-win").addClass("screen-win-one");
         $("#finish").show()
       } else if (exarray.includes(firsttest) && exarray.includes(secondtest) && exarray.includes(thirdtest)) {
-        console.log("X wins");
+         
         nowinner == false;
         $("#board").hide();
         $(".message").text("Winner");
