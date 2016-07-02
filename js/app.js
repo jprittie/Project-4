@@ -1,6 +1,5 @@
 
-// Add self-executing function
-//(function(){
+
 
 // Initialize variables
 var winningarray = [ [0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8], [0,4,8], [2,4,6] ];
@@ -8,6 +7,8 @@ var oharray = [];
 var exarray = [];
 var fillcounter = 0;
 var winner;
+var usedtracker = [];
+var exsquarenumber;
 
 
 // When the page loads, append start and finish screens so they are available,
@@ -76,21 +77,41 @@ $(function(){
        var ohsquarenumber = ($(".boxes li").index($(this)));
        // Add square to oharray, to keep track of which squares O has chosen
        oharray.push(ohsquarenumber);
+       usedtracker.push(ohsquarenumber);
 
       }
-      else {
+      // This else clause was needed for two-player game,
+      // but is not needed for EE version
+      /* else {
        $(this).addClass("box-filled-2");
        var exsquarenumber = ($(".boxes li").index($(this)));
        // Add square to exarray
        exarray.push(exsquarenumber);
 
-      }
+     } */
 
     // Next line disables hover method on square that was clicked on
     // (also makes sure you can't click on it again?)
     $(this).unbind("mouseenter mouseleave");
 
+ winnerTest();
+ drawTest();
 
+  // Finally, at the end of each turn, toggle the active player
+  $("#player1").delay(1000).toggleClass("active");
+  $("#player2").delay(1000).toggleClass("active");
+
+
+  setTimeout(computerTurn, 3000);
+
+
+}); // ends boxes click function - i.e., one turn
+
+
+
+// if ($("#player2").hasClass("active"))
+
+function winnerTest(){
   // Test state of board against possible solutions
   /* I need to check whether the three values in any of winningarray's sub-arrays are all
      included in oharray or exarray. If they are, game is over. If they are not, we keep going
@@ -118,28 +139,65 @@ $(function(){
         $("#finish").show();
       }
     } //ends for loop
+}
 
+function drawTest(){
+// Now, we test for a draw
+// First, count how many boxes have class of .box-filled-1 or .box-filled-2
+ $(".boxes li").each(function(){
+     if ( $(this).hasClass("box-filled-1") || $(this).hasClass("box-filled-2") ) {
+       fillcounter += 1;
+     }
+ });
+ // If all nine squares are filled, and there's no winner, it's a draw
+  if ((fillcounter == 9) && (!winner)) {
+   $(".message").text("It's a draw");
+   $(".screen-win").addClass("screen-win-tie");
+   $("#board").hide();
+   $("#finish").show();
+ }
 
-    // Now, we test for a draw
-    // First, count how many boxes have class of .box-filled-1 or .box-filled-2
-     $(".boxes li").each(function(){
-         if ( $(this).hasClass("box-filled-1") || $(this).hasClass("box-filled-2") ) {
-           fillcounter += 1;
-         }
-     });
-     // If all nine squares are filled, and there's no winner, it's a draw
-      if ((fillcounter == 9) && (!winner)) {
-       $(".message").text("It's a draw");
-       $(".screen-win").addClass("screen-win-tie");
-       $("#board").hide();
-       $("#finish").show();
+}
+
+function computerTurn(){
+
+  exsquarenumber = Math.floor(Math.random() * 9);
+  console.log("Exsquarenumber is " + exsquarenumber);
+
+  // if square has not been filled already, then that's the square the computer picks
+     if (usedtracker.indexOf(exsquarenumber) === -1) {
+       $(".boxes li").eq(exsquarenumber).addClass("box-filled-2");
+       $(".boxes li").eq(exsquarenumber).css("background-image", "url(./img/x.svg)")
+       // Add square to exarray
+       exarray.push(exsquarenumber);
+       usedtracker.push(exsquarenumber);
+       // Disable hover on chosen square
+       $(".boxes li").eq(exsquarenumber).unbind("mouseenter mouseleave");
+
+     } else {
+       // If that random number has been used, keep generating new ones
+       // until you find one that hasn't been used
+       while (usedtracker.indexOf(exsquarenumber) > -1) {
+         exsquarenumber = Math.floor(Math.random() * 9);
+       }
+       $(".boxes li").eq(exsquarenumber).addClass("box-filled-2");
+       $(".boxes li").eq(exsquarenumber).css("background-image", "url(./img/x.svg)")
+       // Add square to exarray
+       exarray.push(exsquarenumber);
+       usedtracker.push(exsquarenumber);
+       // Disable hover on chosen square
+       $(".boxes li").eq(exsquarenumber).unbind("mouseenter mouseleave");
      }
 
+ winnerTest();
+ drawTest();
 
-    // Finally, at the end of each turn, toggle the active player
-    $("#player1").toggleClass("active");
-    $("#player2").toggleClass("active");
-  }); // ends boxes click function - i.e., one turn
+
+// Toggle active classes again so it is human's turn
+$("#player1").delay(2000).toggleClass("active");
+$("#player2").delay(2000).toggleClass("active");
+
+}
 
 
 
@@ -154,6 +212,9 @@ $(function(){
       oharray = [];
       exarray = [];
       fillcounter = 0;
+      // Reset active class to player 1
+      $("#player1").addClass("active");
+      $("#player2").removeClass("active");
 
 
 
@@ -188,6 +249,4 @@ $(function(){
   }); //ends new game click
 
 
-}); // ends document ready
-
-//}()); // ends self-executing function
+} ); // ends document ready
