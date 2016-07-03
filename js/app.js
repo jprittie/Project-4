@@ -5,34 +5,31 @@
 var winningarray = [ [0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8], [0,4,8], [2,4,6] ];
 var oharray = [];
 var exarray = [];
+var usedtracker = [];
 var fillcounter = 0;
 var winner;
-var usedtracker = [];
 var exsquarenumber;
-var playaname;
 
 
 // When the page loads, append start and finish screens so they are available,
 // but only display start screen
-$(function(){
+//$(function(){
+
   // Board screen already exists, so hide it
-  // Actually, I should just take it out of the html and append & hide it here
   $("#board").hide();
 
   // Add start screen
   $("body").append('<div class="screen screen-start" id="start"><header> <h1>Tic Tac Toe</h1><div id="startchoice"><div id="choice"><p><label class="label" for="computer">Play the computer?&nbsp;</label><input type="radio" name="opponent" value="computer" id="computer"></p><p><label for="human" class="label">Play another human?&nbsp;</label><input type="radio" name="opponent" id="human" value="human"></p></div></div><a href="#" class="button" id="startbutton">Start game</a> </header></div>');
 
-
-
-
   // Add finish screen
   $("body").append('<div class="screen screen-win" id="finish"><header><h1>Tic Tac Toe</h1><p class="message"></p><a href="#" class="button newgamebutton">New game</a></header></div>');
+
   // Hide finish screen
   $("#finish").hide();
 
   // Show/hide input fields depending on which radio button is checked
   $("input[name='opponent']").change(function(){
-  if ( ($("input[name='opponent']:checked").val()) == "computer") {
+  if ( ($("input[name='opponent']:checked").val()) == "computer" ) {
     $("#startchoice").append('<div id="entername1"><p><label for="name1">Enter player name:</label></p><p><input type="text" id="name1" name="name1"</p></div>');
     $("#entername2").remove();
 
@@ -43,28 +40,29 @@ $(function(){
    }
   });
 
-  // Add player name(s) to board
-  var playerone = $("#name1").val();
-  var playertwo = $("#name2").val();
-
-  $(".playerboxes").after('<p class="playa"><span id="playa1">Jen</span><span id="playa2">Bob</span></ul>');
+  // Add player name fields to board
+  $(".playerboxes").after('<p class="playertext"><span id="playerone"></span><span id="playertwo"></span></ul>');
 
 
-    // When the player clicks start button, the start screen disappears,
-    // the board appears and the game begins
-    $(".button").click(function(event){
-      event.preventDefault();
-      $("#start").hide();
-      $("#player1").addClass("active");
 
-      // The rest of this should be in a game reset function,
-      // which I don't need to call here
-      $(".screen-win").removeClass("screen-win-one");
-      $(".screen-win").removeClass("screen-win-two");
-      $(".screen-win").removeClass("screen-win-tie");
-      $(".message").text("");
-      $("#board").show();
-    });
+  // When the player clicks start button, the start screen disappears,
+  // the board appears and the game begins
+  $("#startbutton").click(function(event){
+    event.preventDefault();
+    // Set player names based on input
+    $("#playerone").text($("#name1").val());
+    $("#playertwo").text($("#name2").val());
+    // If single player, then opponent's name is Computer
+    if ( $("input[name='opponent']:checked").val() == "computer" ) {
+      $("#playertwo").text("Computer");
+    }
+    // Hide start screen and make player1 active
+    $("#start").hide();
+    $("#player1").addClass("active");
+
+    // Show board
+    $("#board").show();
+  });
 
 
 
@@ -101,7 +99,6 @@ $(function(){
        // Add square to oharray, to keep track of which squares O has chosen
        oharray.push(ohsquarenumber);
        usedtracker.push(ohsquarenumber);
-
       }
       // This else clause was needed for the basic two-player game,
       // but is not needed for EE version
@@ -165,7 +162,8 @@ function winnerTest(){
         $("#finish").show();
       }
     } //ends for loop
-}
+} // ends winnerTest
+
 
 function drawTest(){
 // Now, we test for a draw
@@ -185,6 +183,7 @@ function drawTest(){
 
 }
 
+// This function lets the computer take a turn
 function computerTurn(){
 
   exsquarenumber = Math.floor(Math.random() * 9);
@@ -215,13 +214,13 @@ function computerTurn(){
        $(".boxes li").eq(exsquarenumber).unbind("mouseenter mouseleave");
      }
 
- winnerTest();
- drawTest();
+   winnerTest();
+   drawTest();
 
 
-// Toggle active classes again so it is human's turn
-$("#player1").delay(2000).addClass("active");
-$("#player2").delay(2000).removeClass("active");
+   // Toggle active classes again so it is human's turn
+   $("#player1").delay(2000).addClass("active");
+   $("#player2").delay(2000).removeClass("active");
 
 }
 
@@ -276,4 +275,4 @@ $("#player2").delay(2000).removeClass("active");
   }); //ends new game click
 
 
-} ); // ends document ready
+//} ); // ends document ready

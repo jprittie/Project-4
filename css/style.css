@@ -102,20 +102,18 @@ h1 {
     line-height: 2em:
   }
 
-.playa {
+.playertext {
     margin-top: 2em;
     margin-bottom: 2em;
     width: 100%;
-
-
 }
 
-#playa1 {
+#playerone {
 
   margin-left: 15em;
 }
 
-#playa2 {
+#playertwo {
 
   margin-left: 40em;
 }
