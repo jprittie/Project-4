@@ -138,7 +138,7 @@ $(function(){
        setTimeout(computerTurn, 2000);
 
        /*
-       // Defer re-enable click
+       // Defer re-enable click (handler function is on line 89)
        setTimeout(function () {
             $(".boxes li").click(handler);
        }, 0); */
