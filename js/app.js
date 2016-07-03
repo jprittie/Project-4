@@ -9,6 +9,7 @@ var fillcounter = 0;
 var winner;
 var usedtracker = [];
 var exsquarenumber;
+var playaname;
 
 
 // When the page loads, append start and finish screens so they are available,
@@ -19,12 +20,34 @@ $(function(){
   $("#board").hide();
 
   // Add start screen
-  $("body").append('<div class="screen screen-start" id="start"><header> <h1>Tic Tac Toe</h1> <a href="#" class="button">Start game</a> </header></div>');
+  $("body").append('<div class="screen screen-start" id="start"><header> <h1>Tic Tac Toe</h1><div id="startchoice"><div id="choice"><p><label class="label" for="computer">Play the computer?&nbsp;</label><input type="radio" name="opponent" value="computer" id="computer"></p><p><label for="human" class="label">Play another human?&nbsp;</label><input type="radio" name="opponent" id="human" value="human"></p></div></div><a href="#" class="button" id="startbutton">Start game</a> </header></div>');
+
+
+
 
   // Add finish screen
   $("body").append('<div class="screen screen-win" id="finish"><header><h1>Tic Tac Toe</h1><p class="message"></p><a href="#" class="button newgamebutton">New game</a></header></div>');
   // Hide finish screen
   $("#finish").hide();
+
+  // Show/hide input fields depending on which radio button is checked
+  $("input[name='opponent']").change(function(){
+  if ( ($("input[name='opponent']:checked").val()) == "computer") {
+    $("#startchoice").append('<div id="entername1"><p><label for="name1">Enter player name:</label></p><p><input type="text" id="name1" name="name1"</p></div>');
+    $("#entername2").remove();
+
+   } else {
+    $("#entername1").remove();
+    $("#startchoice").append('<div id="entername2"><p><label for="name1">Enter Player 1  name:</label></p><p><input type="text" id="name1" name="name1"</p><p><label for="name2">Enter Player 2 name:</label></p><p><input type="text" id="name2" name="name1"</p></div>');
+    $("#entername2").show();
+   }
+  });
+
+  // Add player name(s) to board
+  var playerone = $("#name1").val();
+  var playertwo = $("#name2").val();
+
+  $(".playerboxes").after('<p class="playa"><span id="playa1">Jen</span><span id="playa2">Bob</span></ul>');
 
 
     // When the player clicks start button, the start screen disappears,
@@ -80,7 +103,7 @@ $(function(){
        usedtracker.push(ohsquarenumber);
 
       }
-      // This else clause was needed for two-player game,
+      // This else clause was needed for the basic two-player game,
       // but is not needed for EE version
       /* else {
        $(this).addClass("box-filled-2");
@@ -97,19 +120,22 @@ $(function(){
  winnerTest();
  drawTest();
 
-  // Finally, at the end of each turn, toggle the active player
-  $("#player1").delay(1000).toggleClass("active");
-  $("#player2").delay(1000).toggleClass("active");
+// If there's no winner and no draw, toggle active player and give computer a turn
+ if ( (!winner)|| ((fillcounter == 9) && (!winner)) ) {
+   $("#player1").delay(1000).removeClass("active");
+   $("#player2").delay(1000).addClass("active");
+
+   setTimeout(computerTurn, 2000);
+ }
 
 
-  setTimeout(computerTurn, 3000);
+
 
 
 }); // ends boxes click function - i.e., one turn
 
 
 
-// if ($("#player2").hasClass("active"))
 
 function winnerTest(){
   // Test state of board against possible solutions
@@ -194,8 +220,8 @@ function computerTurn(){
 
 
 // Toggle active classes again so it is human's turn
-$("#player1").delay(2000).toggleClass("active");
-$("#player2").delay(2000).toggleClass("active");
+$("#player1").delay(2000).addClass("active");
+$("#player2").delay(2000).removeClass("active");
 
 }
 
@@ -211,6 +237,7 @@ $("#player2").delay(2000).toggleClass("active");
       // Clear player arrays and fillcounter
       oharray = [];
       exarray = [];
+      usedtracker = [];
       fillcounter = 0;
       // Reset active class to player 1
       $("#player1").addClass("active");

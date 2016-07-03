@@ -27,6 +27,8 @@ h1 {
   .button:hover {
     color: #000; }
 
+
+
 .screen {
   text-align: center;
   position: absolute;
@@ -80,6 +82,45 @@ h1 {
     .screen-win-two p:before {
       content: "×";
       top: 4.5rem; }
+
+      #startbutton {
+        margin-top: 2em;
+      }
+
+  .input {
+    margin-top: 6em;
+    margin-right: 2em;
+  }
+
+  .label {
+    line-height: 2em:
+    display: inline-block;
+  }
+
+  #choice {
+    margin-top: 4em;
+    line-height: 2em:
+  }
+
+.playa {
+    margin-top: 2em;
+    margin-bottom: 2em;
+    width: 100%;
+
+
+}
+
+#playa1 {
+
+  margin-left: 15em;
+}
+
+#playa2 {
+
+  margin-left: 40em;
+}
+
+
 
 .board {
   padding-top: 1em; }
