@@ -1,5 +1,6 @@
 
-
+// Add self-executing function
+//(function(){
 
 // Initialize variables
 var winningarray = [ [0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8], [0,4,8], [2,4,6] ];
@@ -13,7 +14,7 @@ var exsquarenumber;
 
 // When the page loads, append start and finish screens so they are available,
 // but only display start screen
-//$(function(){
+$(function(){
 
   // Board screen already exists, so hide it
   $("#board").hide();
@@ -85,7 +86,7 @@ var exsquarenumber;
  // box is filled with appropriate background colour
  // board is then tested for a win or a draw
  // (i.e., this entire function represents one turn)
- $(".boxes li").click(function(){
+ $(".boxes li").click(function handler(){
    fillcounter = 0; //reset first variable that's used to test for draw
    winner = false; //reset second variable that's used to test for draw
 
@@ -109,9 +110,10 @@ var exsquarenumber;
 
        }
 
-    // Next line disables hover method on square that was clicked on
-    // (also makes sure you can't click on it again?)
+    // Disable hover method on square that was clicked on
     $(this).unbind("mouseenter mouseleave");
+    // And make sure you can't click on a filled square, which would trigger the other player's turn too early
+    // $(this).off("click");
 
     // Test board for win or draw
     winnerTest();
@@ -124,11 +126,23 @@ var exsquarenumber;
     }
 
     // If it's a single-player game, and there is no winner and no draw, toggle active player and give computer a turn
-     if ( ( ($("input[name='opponent']:checked").val()) == "computer" ) && ( (!winner) || ((fillcounter == 9) && (!winner)) ) ) {
+    // But also make sure player1 can't click again during computer's turn
+     if ( ( ($("input[name='opponent']:checked").val()) == "computer" ) && (!winner) && (fillcounter < 9)  ) {
+
+       // Disable click temporarily for all boxes while computer plays
+       // $(".boxes li").off("click");
+
        $("#player1").delay(1000).removeClass("active");
        $("#player2").delay(1000).addClass("active");
 
        setTimeout(computerTurn, 2000);
+
+       /*
+       // Defer re-enable click
+       setTimeout(function () {
+            $(".boxes li").click(handler);
+       }, 0); */
+
      }
 
 
@@ -188,6 +202,9 @@ function drawTest(){
    $(".screen-win").addClass("screen-win-tie");
    $("#board").hide();
    $("#finish").show();
+   // Reset active class to player 1
+   $("#player1").addClass("active");
+   $("#player2").removeClass("active");
  }
 
 }
@@ -196,7 +213,6 @@ function drawTest(){
 function computerTurn(){
 
   exsquarenumber = Math.floor(Math.random() * 9);
-  console.log("Exsquarenumber is " + exsquarenumber);
 
   // if square has not been filled already, then that's the square the computer picks
      if (usedtracker.indexOf(exsquarenumber) === -1) {
@@ -228,6 +244,8 @@ function computerTurn(){
    drawTest();
 
 
+
+
    // Toggle active classes again so it is human's turn
    $("#player1").delay(2000).addClass("active");
    $("#player2").delay(2000).removeClass("active");
@@ -239,6 +257,7 @@ function computerTurn(){
   // When new game button is clicked, restart game
   $(".newgamebutton").click(function(event){
       event.preventDefault();
+
       // Must clear all filled boxes and svg background images
       $(".boxes li").removeClass("box-filled-1");
       $(".boxes li").removeClass("box-filled-2");
@@ -261,9 +280,6 @@ function computerTurn(){
       $(".screen-win").removeClass("screen-win-tie");
       $(".message").text("");
 
-      // I don't know why player 2 is still active at this point,
-      // but make it inactive
-      $("#player2").removeClass("active");
 
 
       $("#board").show();
@@ -275,14 +291,18 @@ function computerTurn(){
           if ($("#player1").hasClass("active")) {
             $(this).css("background-image", "url(./img/o.svg)");
           }
-          else {
+          // I only want X hover to work if it's a two-player game
+          else if ( ($("#player2").hasClass("active")) && (($("input[name='opponent']:checked").val()) == "human") ) {
             $(this).css("background-image", "url(./img/x.svg)");
 
           }
       }, function() {
         $(this).css("background-image", "none");
-      });
+      }); //ends re-enable hover
+
   }); //ends new game click
 
 
-//} ); // ends document ready
+}); // ends document ready
+
+//}()); // ends self-executing function

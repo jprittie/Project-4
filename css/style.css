@@ -118,6 +118,9 @@ h1 {
   margin-left: 40em;
 }
 
+input {
+  text-align: center;
+}
 
 
 .board {
