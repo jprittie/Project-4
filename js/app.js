@@ -86,7 +86,9 @@ $(function(){
  // box is filled with appropriate background colour
  // board is then tested for a win or a draw
  // (i.e., this entire function represents one turn)
- $(".boxes li").click(function handler(){
+function playerTurn() {
+
+ $(".boxes li").click(function (){
    fillcounter = 0; //reset first variable that's used to test for draw
    winner = false; //reset second variable that's used to test for draw
 
@@ -113,7 +115,7 @@ $(function(){
     // Disable hover method on square that was clicked on
     $(this).unbind("mouseenter mouseleave");
     // And make sure you can't click on a filled square, which would trigger the other player's turn too early
-    // $(this).off("click");
+    $(this).off();
 
     // Test board for win or draw
     winnerTest();
@@ -129,8 +131,7 @@ $(function(){
     // But also make sure player1 can't click again during computer's turn
      if ( ( ($("input[name='opponent']:checked").val()) == "computer" ) && (!winner) && (fillcounter < 9)  ) {
 
-       // Disable click temporarily for all boxes while computer plays
-       // $(".boxes li").off("click");
+
 
        $("#player1").delay(1000).removeClass("active");
        $("#player2").delay(1000).addClass("active");
@@ -148,8 +149,9 @@ $(function(){
 
 }); // ends boxes click function - i.e., one turn
 
+} // ends playerTurn function
 
-
+playerTurn();
 
 function winnerTest(){
   // Test state of board against possible solutions
@@ -223,6 +225,7 @@ function computerTurn(){
        usedtracker.push(exsquarenumber);
        // Disable hover on chosen square
        $(".boxes li").eq(exsquarenumber).unbind("mouseenter mouseleave");
+       $(".boxes li").eq(exsquarenumber).off();
 
      } else {
        // If that random number has been used, keep generating new ones
@@ -238,6 +241,7 @@ function computerTurn(){
        usedtracker.push(exsquarenumber);
        // Disable hover on chosen square
        $(".boxes li").eq(exsquarenumber).unbind("mouseenter mouseleave");
+       $(".boxes li").eq(exsquarenumber).off();
      }
 
    winnerTest();
@@ -249,6 +253,8 @@ function computerTurn(){
    // Toggle active classes again so it is human's turn
    $("#player1").delay(2000).addClass("active");
    $("#player2").delay(2000).removeClass("active");
+   // Calling playerTurn should re-enable click handlers
+   playerTurn();
 
 }
 
