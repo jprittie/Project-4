@@ -99,34 +99,37 @@ var exsquarenumber;
        // Add square to oharray, to keep track of which squares O has chosen
        oharray.push(ohsquarenumber);
        usedtracker.push(ohsquarenumber);
-      }
-      // This else clause was needed for the basic two-player game,
-      // but is not needed for EE version
-      /* else {
+
+       // If player2 is active and it is a two player game, player2 takes a turn
+       } else if ( ($("#player2").hasClass("active")) && ( ($("input[name='opponent']:checked").val()) == "human" ) ) {
        $(this).addClass("box-filled-2");
        var exsquarenumber = ($(".boxes li").index($(this)));
        // Add square to exarray
        exarray.push(exsquarenumber);
 
-     } */
+       }
 
     // Next line disables hover method on square that was clicked on
     // (also makes sure you can't click on it again?)
     $(this).unbind("mouseenter mouseleave");
 
- winnerTest();
- drawTest();
+    // Test board for win or draw
+    winnerTest();
+    drawTest();
 
-// If there's no winner and no draw, toggle active player and give computer a turn
- if ( (!winner)|| ((fillcounter == 9) && (!winner)) ) {
-   $("#player1").delay(1000).removeClass("active");
-   $("#player2").delay(1000).addClass("active");
+    // If it's a two-player game, toggle active player classes
+    if ( ($("input[name='opponent']:checked").val()) == "human" ) {
+      $("#player1").delay(1000).toggleClass("active");
+      $("#player2").delay(1000).toggleClass("active");
+    }
 
-   setTimeout(computerTurn, 2000);
- }
+    // If it's a single-player game, and there is no winner and no draw, toggle active player and give computer a turn
+     if ( ( ($("input[name='opponent']:checked").val()) == "computer" ) && ( (!winner) || ((fillcounter == 9) && (!winner)) ) ) {
+       $("#player1").delay(1000).removeClass("active");
+       $("#player2").delay(1000).addClass("active");
 
-
-
+       setTimeout(computerTurn, 2000);
+     }
 
 
 }); // ends boxes click function - i.e., one turn
@@ -234,8 +237,8 @@ function computerTurn(){
 
 
   // When new game button is clicked, restart game
-  $(".newgamebutton").click(function(){
-
+  $(".newgamebutton").click(function(event){
+      event.preventDefault();
       // Must clear all filled boxes and svg background images
       $(".boxes li").removeClass("box-filled-1");
       $(".boxes li").removeClass("box-filled-2");
