@@ -72,9 +72,9 @@ var exsquarenumber;
         if ($("#player1").hasClass("active")) {
           $(this).css("background-image", "url(./img/o.svg)");
         }
-        else {
+        // I only want X hover to work if it's a two-player game
+        else if ( ($("#player2").hasClass("active")) && (($("input[name='opponent']:checked").val()) == "human") )  {
           $(this).css("background-image", "url(./img/x.svg)");
-
         }
     }, function() {
       $(this).css("background-image", "none");
@@ -150,14 +150,20 @@ function winnerTest(){
       if (oharray.includes(firsttest) && oharray.includes(secondtest) && oharray.includes(thirdtest)) {
         winner = true;
         $("#board").hide();
-        $(".message").text("Winner");
+        $(".message").text(($("#name1").val()) + " wins");
         $(".screen-win").addClass("screen-win-one");
         $("#finish").show()
 
       } else if (exarray.includes(firsttest) && exarray.includes(secondtest) && exarray.includes(thirdtest)) {
         winner = true;
         $("#board").hide();
-        $(".message").text("Winner");
+
+        if ( $("input[name='opponent']:checked").val() == "computer" ) {
+          $(".message").text("Computer wins");
+        } else {
+          $(".message").text(($("#name2").val()) + " wins");
+        }
+
         $(".screen-win").addClass("screen-win-two");
         $("#finish").show();
       }
@@ -202,7 +208,8 @@ function computerTurn(){
      } else {
        // If that random number has been used, keep generating new ones
        // until you find one that hasn't been used
-       while (usedtracker.indexOf(exsquarenumber) > -1) {
+       // Note: (usedtracker.length != 9) check means while loop doesn't keep going if there's a draw
+       while ((usedtracker.indexOf(exsquarenumber) > -1) && (usedtracker.length != 9)) {
          exsquarenumber = Math.floor(Math.random() * 9);
        }
        $(".boxes li").eq(exsquarenumber).addClass("box-filled-2");
