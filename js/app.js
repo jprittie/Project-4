@@ -10,6 +10,7 @@ var usedtracker = [];
 var fillcounter = 0;
 var winner;
 var exsquarenumber;
+var clickedsquare;
 
 
 // When the page loads, append start and finish screens so they are available,
@@ -46,8 +47,8 @@ $(function(){
 
 
 
-  // When the player clicks start button, the start screen disappears,
-  // the board appears and the game begins
+  // When the player clicks start button, player names are set
+  // Then the start screen disappears, the board appears and the game begins
   $("#startbutton").click(function(event){
     event.preventDefault();
     // Set player names based on input
@@ -60,26 +61,28 @@ $(function(){
     // Hide start screen and make player1 active
     $("#start").hide();
     $("#player1").addClass("active");
-
     // Show board
     $("#board").show();
   });
 
 
-
 // On hover, player-specific svg appears
 // Note: hover method takes two functions as parameters
-    $(".boxes li").hover(function () {
-        if ($("#player1").hasClass("active")) {
-          $(this).css("background-image", "url(./img/o.svg)");
-        }
-        // I only want X hover to work if it's a two-player game
-        else if ( ($("#player2").hasClass("active")) && (($("input[name='opponent']:checked").val()) == "human") )  {
-          $(this).css("background-image", "url(./img/x.svg)");
-        }
-    }, function() {
-      $(this).css("background-image", "none");
-    });
+// I'm wrapping it in a function because I will have to re-use it later
+   function hover(){
+      $(".boxes li").hover(function () {
+          if ($("#player1").hasClass("active")) {
+            $(this).css("background-image", "url(./img/o.svg)");
+          }
+          // I only want X hover to work if it's a two-player game
+          else if ( ($("#player2").hasClass("active")) && (($("input[name='opponent']:checked").val()) == "human") )  {
+            $(this).css("background-image", "url(./img/x.svg)");
+          }
+      }, function() {
+        $(this).css("background-image", "none");
+      });
+   }
+   hover();
 
 
  // On click, player-specific svg is added to square,
@@ -91,35 +94,14 @@ function playerTurn() {
  $(".boxes li").click(function (){
    fillcounter = 0; //reset first variable that's used to test for draw
    winner = false; //reset second variable that's used to test for draw
+   clickedsquare = $(".boxes li").index($(this));
+   console.log("Clicked square is " + clickedsquare);
 
-      if ($("#player1").hasClass("active")) {
-       $(this).addClass("box-filled-1");
-       // I keep track of square's number based on its position
-       // in the $(".boxes li") array-like collection;
-       // i.e., boxes already have index numbers from 0 to 8,
-       // and I'm just utilizing those numbers
-       var ohsquarenumber = ($(".boxes li").index($(this)));
-       // Add square to oharray, to keep track of which squares O has chosen
-       oharray.push(ohsquarenumber);
-       usedtracker.push(ohsquarenumber);
 
-       // If player2 is active and it is a two player game, player2 takes a turn
-       } else if ( ($("#player2").hasClass("active")) && ( ($("input[name='opponent']:checked").val()) == "human" ) ) {
-       $(this).addClass("box-filled-2");
-       var exsquarenumber = ($(".boxes li").index($(this)));
-       // Add square to exarray
-       exarray.push(exsquarenumber);
-
-       }
-
-    // Disable hover method on square that was clicked on
-    $(this).unbind("mouseenter mouseleave");
-    // And make sure you can't click on a filled square, which would trigger the other player's turn too early
-    $(this).off();
-
-    // Test board for win or draw
-    winnerTest();
-    drawTest();
+   playerChooseOhSquare(clickedsquare);
+   playerChooseExSquare(clickedsquare);
+   winnerTest();
+   drawTest();
 
     // If it's a two-player game, toggle active player classes
     if ( ($("input[name='opponent']:checked").val()) == "human" ) {
@@ -128,30 +110,91 @@ function playerTurn() {
     }
 
     // If it's a single-player game, and there is no winner and no draw, toggle active player and give computer a turn
-    // But also make sure player1 can't click again during computer's turn
      if ( ( ($("input[name='opponent']:checked").val()) == "computer" ) && (!winner) && (fillcounter < 9)  ) {
-
-
-
        $("#player1").delay(1000).removeClass("active");
        $("#player2").delay(1000).addClass("active");
-
-       setTimeout(computerTurn, 2000);
-
-       /*
-       // Defer re-enable click (handler function is on line 89)
-       setTimeout(function () {
-            $(".boxes li").click(handler);
-       }, 0); */
-
+       setTimeout(computerChooseExSquare, 2000);
      }
 
 
 }); // ends boxes click function - i.e., one turn
 
 } // ends playerTurn function
-
 playerTurn();
+
+
+function playerChooseOhSquare(clickedsquare) {
+  console.log("playerChooseOhSquare called" );
+  // If player1 is active, player1 takes a turn
+  if ($("#player1").hasClass("active")) {
+    $(".boxes li").eq(clickedsquare).addClass("box-filled-1");
+    // I keep track of square's number based on its position in the $(".boxes li") array-like collection, i.e. using index number from 0 to 8
+    // Add square to oharray, to keep track of which squares O has chosen
+    oharray.push(clickedsquare);
+    usedtracker.push(clickedsquare);
+    // Disable hover and click on chosen square
+    $(".boxes li").eq(clickedsquare).unbind("mouseenter mouseleave");
+    $(".boxes li").eq(clickedsquare).off();
+  }
+}
+
+ function playerChooseExSquare(clickedsquare) {
+   console.log("playerChooseExSquare called" );
+  // If player2 is active and it is a two-player game, player2 takes a turn
+   if ( ($("#player2").hasClass("active")) && ( ($("input[name='opponent']:checked").val()) == "human" ) ) {
+    $(".boxes li").eq(clickedsquare).addClass("box-filled-2");
+    // var exsquarenumber = ($(".boxes li").index(clickedsquare));
+    // Add square to exarray
+    exarray.push(clickedsquare);
+    usedtracker.push(clickedsquare);
+    // Disable hover and click on chosen square
+    $(".boxes li").eq(clickedsquare).unbind("mouseenter mouseleave");
+    $(".boxes li").eq(clickedsquare).off();
+  }
+} // ends chooseSquare
+
+
+// This function lets the computer take a turn
+function computerChooseExSquare(){
+  console.log("computerChooseExSquare called");
+  exsquarenumber = Math.floor(Math.random() * 9);
+  // if square has not been filled already, then that's the square the computer picks
+     if (usedtracker.indexOf(exsquarenumber) === -1) {
+       exSquareChoice();
+       console.log("computerChooseExSquare if called");
+
+     } else {
+       console.log("computerChooseExSquare else called");
+       // If that random number has been used, keep generating new ones
+       // until you find one that hasn't been used
+       // Note: (usedtracker.length != 9) check means while loop doesn't keep going if there's a draw
+       while ((usedtracker.indexOf(exsquarenumber) > -1) && (usedtracker.length != 9)) {
+         exsquarenumber = Math.floor(Math.random() * 9);
+       }
+       exSquareChoice();
+     }
+
+   winnerTest();
+   drawTest();
+
+   // Toggle active classes again so it is human's turn
+   $("#player1").delay(2000).addClass("active");
+   $("#player2").delay(2000).removeClass("active");
+
+}
+
+
+function exSquareChoice(){
+  $(".boxes li").eq(exsquarenumber).addClass("box-filled-2");
+  $(".boxes li").eq(exsquarenumber).css("background-image", "url(./img/x.svg)")
+  // Add square to exarray
+  exarray.push(exsquarenumber);
+  usedtracker.push(exsquarenumber);
+  // Disable hover and click on chosen square
+  $(".boxes li").eq(exsquarenumber).unbind("mouseenter mouseleave");
+  $(".boxes li").eq(exsquarenumber).off();
+}
+
 
 function winnerTest(){
   // Test state of board against possible solutions
@@ -211,102 +254,41 @@ function drawTest(){
 
 }
 
-// This function lets the computer take a turn
-function computerTurn(){
-
-  exsquarenumber = Math.floor(Math.random() * 9);
-
-  // if square has not been filled already, then that's the square the computer picks
-     if (usedtracker.indexOf(exsquarenumber) === -1) {
-       $(".boxes li").eq(exsquarenumber).addClass("box-filled-2");
-       $(".boxes li").eq(exsquarenumber).css("background-image", "url(./img/x.svg)")
-       // Add square to exarray
-       exarray.push(exsquarenumber);
-       usedtracker.push(exsquarenumber);
-       // Disable hover on chosen square
-       $(".boxes li").eq(exsquarenumber).unbind("mouseenter mouseleave");
-       $(".boxes li").eq(exsquarenumber).off();
-
-     } else {
-       // If that random number has been used, keep generating new ones
-       // until you find one that hasn't been used
-       // Note: (usedtracker.length != 9) check means while loop doesn't keep going if there's a draw
-       while ((usedtracker.indexOf(exsquarenumber) > -1) && (usedtracker.length != 9)) {
-         exsquarenumber = Math.floor(Math.random() * 9);
-       }
-       $(".boxes li").eq(exsquarenumber).addClass("box-filled-2");
-       $(".boxes li").eq(exsquarenumber).css("background-image", "url(./img/x.svg)")
-       // Add square to exarray
-       exarray.push(exsquarenumber);
-       usedtracker.push(exsquarenumber);
-       // Disable hover on chosen square
-       $(".boxes li").eq(exsquarenumber).unbind("mouseenter mouseleave");
-       $(".boxes li").eq(exsquarenumber).off();
-     }
-
-   winnerTest();
-   drawTest();
-
-
-
-
-   // Toggle active classes again so it is human's turn
-   $("#player1").delay(2000).addClass("active");
-   $("#player2").delay(2000).removeClass("active");
-   // Calling playerTurn should re-enable click handlers
-   playerTurn();
-
-}
-
-
-
-  // When new game button is clicked, restart game
+// When new game button is clicked, restart game
   $(".newgamebutton").click(function(event){
       event.preventDefault();
 
-      // Must clear all filled boxes and svg background images
-      $(".boxes li").removeClass("box-filled-1");
-      $(".boxes li").removeClass("box-filled-2");
-      $(".boxes li").css("background-image", "none");
-      // Clear player arrays and fillcounter
-      oharray = [];
-      exarray = [];
-      usedtracker = [];
-      fillcounter = 0;
-      // Reset active class to player 1
-      $("#player1").addClass("active");
-      $("#player2").removeClass("active");
-
+      resetGame();
+      // Re-enable hover on boxes
+      hover();
+      playerTurn();
 
 
       $("#finish").hide();
-      // Clear winning screens, tie screen and winner/it's a draw message
-      $(".screen-win").removeClass("screen-win-one");
-      $(".screen-win").removeClass("screen-win-two");
-      $(".screen-win").removeClass("screen-win-tie");
-      $(".message").text("");
-
-
-
       $("#board").show();
+   }); //ends new game click
 
-      // Re-enable hover on boxes
-      // I shouldn't have to write all this out again,
-      // but I'm not sure how to fix it
-      $(".boxes li").hover(function () {
-          if ($("#player1").hasClass("active")) {
-            $(this).css("background-image", "url(./img/o.svg)");
-          }
-          // I only want X hover to work if it's a two-player game
-          else if ( ($("#player2").hasClass("active")) && (($("input[name='opponent']:checked").val()) == "human") ) {
-            $(this).css("background-image", "url(./img/x.svg)");
 
-          }
-      }, function() {
-        $(this).css("background-image", "none");
-      }); //ends re-enable hover
+  function resetGame(){
+    // Must clear all filled boxes and svg background images
+    $(".boxes li").removeClass("box-filled-1");
+    $(".boxes li").removeClass("box-filled-2");
+    $(".boxes li").css("background-image", "none");
+    // Clear player arrays and fillcounter
+    oharray = [];
+    exarray = [];
+    usedtracker = [];
+    fillcounter = 0;
+    // Reset active class to player 1
+    $("#player1").addClass("active");
+    $("#player2").removeClass("active");
 
-  }); //ends new game click
+    // Clear winning screens, tie screen and winner/it's a draw message
+    $(".screen-win").removeClass("screen-win-one");
+    $(".screen-win").removeClass("screen-win-two");
+    $(".screen-win").removeClass("screen-win-tie");
+    $(".message").text("");
+  }
 
 
 }); // ends document ready
