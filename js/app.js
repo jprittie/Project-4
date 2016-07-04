@@ -54,9 +54,12 @@ $(function(){
     // Set player names based on input
     $("#playerone").text($("#name1").val());
     $("#playertwo").text($("#name2").val());
-    // If single player, then opponent's name is Computer
+    // If single player, then opponent's name is Computer, and call singlePlayerGame
     if ( $("input[name='opponent']:checked").val() == "computer" ) {
       $("#playertwo").text("Computer");
+      singlePlayerGame();
+    } else if ( ($("input[name='opponent']:checked").val()) == "human" ) {
+      twoPlayerGame();
     }
     // Hide start screen and make player1 active
     $("#start").hide();
@@ -69,89 +72,113 @@ $(function(){
 // On hover, player-specific svg appears
 // Note: hover method takes two functions as parameters
 // I'm wrapping it in a function because I will have to re-use it later
-   function hover(){
-      $(".boxes li").hover(function () {
-          if ($("#player1").hasClass("active")) {
-            $(this).css("background-image", "url(./img/o.svg)");
-          }
-          // I only want X hover to work if it's a two-player game
-          else if ( ($("#player2").hasClass("active")) && (($("input[name='opponent']:checked").val()) == "human") )  {
-            $(this).css("background-image", "url(./img/x.svg)");
-          }
-      }, function() {
-        $(this).css("background-image", "none");
-      });
-   }
-   hover();
+function hover(){
+    $(".boxes li").hover(function () {
+        if ($("#player1").hasClass("active")) {
+          $(this).css("background-image", "url(./img/o.svg)");
+        }
+        // I only want X hover to work if it's a two-player game
+        else if ( ($("#player2").hasClass("active")) && (($("input[name='opponent']:checked").val()) == "human") )  {
+          $(this).css("background-image", "url(./img/x.svg)");
+        }
+    }, function() {
+      $(this).css("background-image", "none");
+    });
+ }
+ hover();
 
 
- // On click, player-specific svg is added to square,
- // box is filled with appropriate background colour
- // board is then tested for a win or a draw
- // (i.e., this entire function represents one turn)
-function playerTurn() {
-
- $(".boxes li").click(function (){
-   fillcounter = 0; //reset first variable that's used to test for draw
-   winner = false; //reset second variable that's used to test for draw
-   clickedsquare = $(".boxes li").index($(this));
-   console.log("Clicked square is " + clickedsquare);
 
 
-   playerChooseOhSquare(clickedsquare);
-   playerChooseExSquare(clickedsquare);
-   winnerTest();
-   drawTest();
+function singlePlayerGame() {
+ // This function enables a turn by O and a turn by the computer
+   $(".boxes li").click(function(){
+     fillcounter = 0; //reset first variable that's used to test for draw
+     winner = false; //reset second variable that's used to test for draw
+     clickedsquare = $(".boxes li").index($(this));
+     console.log("Clicked square is " + clickedsquare);
 
-    // If it's a two-player game, toggle active player classes
-    if ( ($("input[name='opponent']:checked").val()) == "human" ) {
-      $("#player1").delay(1000).toggleClass("active");
-      $("#player2").delay(1000).toggleClass("active");
-    }
+     // O takes a turn
+     if ($("#player1").hasClass("active")) {
+       playerChooseOhSquare(clickedsquare);
+     }
+     // Then test board for winner or draw
+     winnerTest();
+     drawTest();
 
-    // If it's a single-player game, and there is no winner and no draw, toggle active player and give computer a turn
-     if ( ( ($("input[name='opponent']:checked").val()) == "computer" ) && (!winner) && (fillcounter < 9)  ) {
-       $("#player1").delay(1000).removeClass("active");
-       $("#player2").delay(1000).addClass("active");
-       setTimeout(computerChooseExSquare, 2000);
+     // If there is no winner and no draw, toggle active player and give computer a turn
+     if ( (!winner) && (fillcounter < 9)  ) {
+       $("#player1").removeClass("active");
+       $("#player2").addClass("active");
+       setTimeout(computerChooseExSquare, 500);
+       // computerChooseExSquare();
      }
 
+    }); // ends boxes click function
 
-}); // ends boxes click function - i.e., one turn
+} // ends singlePlayerGame function
 
-} // ends playerTurn function
-playerTurn();
+
+function twoPlayerGame() {
+  // This function lets O and X take turns
+    $(".boxes li").click(function(){
+     fillcounter = 0; //reset first variable that's used to test for draw
+     winner = false; //reset second variable that's used to test for draw
+     clickedsquare = $(".boxes li").index($(this));
+     console.log("Clicked square is " + clickedsquare);
+
+     // O takes a turn
+     if ($("#player1").hasClass("active")) {
+       playerChooseOhSquare(clickedsquare);
+     } else {
+     // X takes a turn
+       playerChooseExSquare(clickedsquare);
+     }
+
+     // Then test board for winner or draw
+     winnerTest();
+     drawTest();
+
+     // Toggle active player classes
+     $("#player1").toggleClass("active");
+     $("#player2").toggleClass("active");
+
+    }); // ends boxes click function
+
+} // ends twoPlayerGame function
+
+
 
 
 function playerChooseOhSquare(clickedsquare) {
+
   console.log("playerChooseOhSquare called" );
-  // If player1 is active, player1 takes a turn
-  if ($("#player1").hasClass("active")) {
+    // Add svg and background colour
     $(".boxes li").eq(clickedsquare).addClass("box-filled-1");
-    // I keep track of square's number based on its position in the $(".boxes li") array-like collection, i.e. using index number from 0 to 8
-    // Add square to oharray, to keep track of which squares O has chosen
+    // I keep track of square's number based on its position in $(".boxes li"), i.e. using index number from 0 to 8
+    // Add square to oharray
     oharray.push(clickedsquare);
     usedtracker.push(clickedsquare);
     // Disable hover and click on chosen square
     $(".boxes li").eq(clickedsquare).unbind("mouseenter mouseleave");
     $(".boxes li").eq(clickedsquare).off();
-  }
+
 }
 
  function playerChooseExSquare(clickedsquare) {
-   console.log("playerChooseExSquare called" );
-  // If player2 is active and it is a two-player game, player2 takes a turn
-   if ( ($("#player2").hasClass("active")) && ( ($("input[name='opponent']:checked").val()) == "human" ) ) {
+    console.log("playerChooseExSquare called" );
+    // Add svg and background colour
     $(".boxes li").eq(clickedsquare).addClass("box-filled-2");
-    // var exsquarenumber = ($(".boxes li").index(clickedsquare));
     // Add square to exarray
     exarray.push(clickedsquare);
     usedtracker.push(clickedsquare);
     // Disable hover and click on chosen square
     $(".boxes li").eq(clickedsquare).unbind("mouseenter mouseleave");
     $(".boxes li").eq(clickedsquare).off();
-  }
-} // ends chooseSquare
+
+  } // ends playerChooseExSquare
+
+
 
 
 // This function lets the computer take a turn
@@ -161,10 +188,10 @@ function computerChooseExSquare(){
   // if square has not been filled already, then that's the square the computer picks
      if (usedtracker.indexOf(exsquarenumber) === -1) {
        exSquareChoice();
-       console.log("computerChooseExSquare if called");
+       // console.log("computerChooseExSquare if called");
 
      } else {
-       console.log("computerChooseExSquare else called");
+       // console.log("computerChooseExSquare else called");
        // If that random number has been used, keep generating new ones
        // until you find one that hasn't been used
        // Note: (usedtracker.length != 9) check means while loop doesn't keep going if there's a draw
@@ -178,12 +205,12 @@ function computerChooseExSquare(){
    drawTest();
 
    // Toggle active classes again so it is human's turn
-   $("#player1").delay(2000).addClass("active");
-   $("#player2").delay(2000).removeClass("active");
+   $("#player1").addClass("active");
+   $("#player2").removeClass("active");
 
 }
 
-
+// Fills X square on computer's turn
 function exSquareChoice(){
   $(".boxes li").eq(exsquarenumber).addClass("box-filled-2");
   $(".boxes li").eq(exsquarenumber).css("background-image", "url(./img/x.svg)")
@@ -254,41 +281,42 @@ function drawTest(){
 
 }
 
-// When new game button is clicked, restart game
+// When new game button is clicked, reset things and restart game
   $(".newgamebutton").click(function(event){
       event.preventDefault();
 
-      resetGame();
+      // Clear all filled boxes and svg background images
+      $(".boxes li").removeClass("box-filled-1");
+      $(".boxes li").removeClass("box-filled-2");
+      $(".boxes li").css("background-image", "none");
+      // Clear player arrays and fillcounter
+      oharray = [];
+      exarray = [];
+      usedtracker = [];
+      fillcounter = 0;
+      // Reset active class to player 1
+      $("#player1").addClass("active");
+      $("#player2").removeClass("active");
+      // Clear winning screens, tie screen and winner/it's a draw message
+      $(".screen-win").removeClass("screen-win-one");
+      $(".screen-win").removeClass("screen-win-two");
+      $(".screen-win").removeClass("screen-win-tie");
+      $(".message").text("");
+
+
       // Re-enable hover on boxes
       hover();
-      playerTurn();
+      // Call either singlePlayerGame or twoPlayerGame
+      if ( $("input[name='opponent']:checked").val() == "computer" ) {
+        singlePlayerGame();
+      } else if ( ($("input[name='opponent']:checked").val()) == "human" ) {
+        twoPlayerGame();
+      }
 
 
       $("#finish").hide();
       $("#board").show();
    }); //ends new game click
-
-
-  function resetGame(){
-    // Must clear all filled boxes and svg background images
-    $(".boxes li").removeClass("box-filled-1");
-    $(".boxes li").removeClass("box-filled-2");
-    $(".boxes li").css("background-image", "none");
-    // Clear player arrays and fillcounter
-    oharray = [];
-    exarray = [];
-    usedtracker = [];
-    fillcounter = 0;
-    // Reset active class to player 1
-    $("#player1").addClass("active");
-    $("#player2").removeClass("active");
-
-    // Clear winning screens, tie screen and winner/it's a draw message
-    $(".screen-win").removeClass("screen-win-one");
-    $(".screen-win").removeClass("screen-win-two");
-    $(".screen-win").removeClass("screen-win-tie");
-    $(".message").text("");
-  }
 
 
 }); // ends document ready
