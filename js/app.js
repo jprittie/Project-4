@@ -1,6 +1,6 @@
 
 // Add self-executing function
-//(function(){
+(function(){
 
 // Initialize variables
 var winningarray = [ [0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8], [0,4,8], [2,4,6] ];
@@ -11,6 +11,7 @@ var fillcounter = 0;
 var winner;
 var exsquarenumber;
 var clickedsquare;
+
 
 
 // When the page loads, append start and finish screens so they are available,
@@ -110,7 +111,8 @@ function singlePlayerGame() {
      if ( (!winner) && (fillcounter < 9)  ) {
        $("#player1").removeClass("active");
        $("#player2").addClass("active");
-       setTimeout(computerChooseExSquare, 500);
+
+       setTimeout(computerChooseExSquare, 300);
        // computerChooseExSquare();
      }
 
@@ -160,7 +162,6 @@ function playerChooseOhSquare(clickedsquare) {
     oharray.push(clickedsquare);
     usedtracker.push(clickedsquare);
     // Disable hover and click on chosen square
-    $(".boxes li").eq(clickedsquare).unbind("mouseenter mouseleave");
     $(".boxes li").eq(clickedsquare).off();
 
 }
@@ -173,7 +174,6 @@ function playerChooseOhSquare(clickedsquare) {
     exarray.push(clickedsquare);
     usedtracker.push(clickedsquare);
     // Disable hover and click on chosen square
-    $(".boxes li").eq(clickedsquare).unbind("mouseenter mouseleave");
     $(".boxes li").eq(clickedsquare).off();
 
   } // ends playerChooseExSquare
@@ -213,12 +213,11 @@ function computerChooseExSquare(){
 // Fills X square on computer's turn
 function exSquareChoice(){
   $(".boxes li").eq(exsquarenumber).addClass("box-filled-2");
-  $(".boxes li").eq(exsquarenumber).css("background-image", "url(./img/x.svg)")
+  $(".boxes li").eq(exsquarenumber).css("background-image", "url(./img/x.svg)");
   // Add square to exarray
   exarray.push(exsquarenumber);
   usedtracker.push(exsquarenumber);
   // Disable hover and click on chosen square
-  $(".boxes li").eq(exsquarenumber).unbind("mouseenter mouseleave");
   $(".boxes li").eq(exsquarenumber).off();
 }
 
@@ -231,21 +230,23 @@ function winnerTest(){
   */
 
     for (var i=0; i<winningarray.length; i++){
+
       fillcounter = 0;
       var firsttest = winningarray[i][0];
       var secondtest = winningarray[i][1];
       var thirdtest = winningarray[i][2];
 
-      if (oharray.includes(firsttest) && oharray.includes(secondtest) && oharray.includes(thirdtest)) {
+      if ( (oharray.indexOf(firsttest) > -1) && (oharray.indexOf(secondtest) > -1) && (oharray.indexOf(thirdtest) > -1) ) {
         winner = true;
         $("#board").hide();
         $(".message").text(($("#name1").val()) + " wins");
         $(".screen-win").addClass("screen-win-one");
-        $("#finish").show()
+        $("#finish").show();
 
-      } else if (exarray.includes(firsttest) && exarray.includes(secondtest) && exarray.includes(thirdtest)) {
-        winner = true;
-        $("#board").hide();
+
+        } else if ( (exarray.indexOf(firsttest) > -1) && (exarray.indexOf(secondtest) > -1) && (exarray.indexOf(thirdtest) > -1) ) {
+            winner = true;
+            $("#board").hide();
 
         if ( $("input[name='opponent']:checked").val() == "computer" ) {
           $(".message").text("Computer wins");
@@ -303,7 +304,7 @@ function drawTest(){
       $(".screen-win").removeClass("screen-win-tie");
       $(".message").text("");
 
-
+      $(".boxes li").off();
       // Re-enable hover on boxes
       hover();
       // Call either singlePlayerGame or twoPlayerGame
@@ -321,4 +322,4 @@ function drawTest(){
 
 }); // ends document ready
 
-//}()); // ends self-executing function
+}()); // ends self-executing function
