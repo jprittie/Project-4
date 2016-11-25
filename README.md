@@ -1,6 +1,8 @@
 ##Tic-Tac-Toe
 *Project 4 of Treehouse Full Stack JavaScript course*
 
+You can [view the project here.](https://jprittie.github.io/Tic-Tac-Toe/)
+
 ###Project objectives:
 Build a functional two-person Tic-Tac-Toe game. Use the provided mockups, HTML, CSS and image files to create a game that requires players to add their names and take turns adding an X or O to the game board.
 
